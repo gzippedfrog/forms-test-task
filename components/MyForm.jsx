@@ -11,6 +11,8 @@ import {
 import DropDown from "react-native-paper-dropdown";
 import { Formik } from "formik";
 import * as Yup from "yup";
+import { MaskedTextInput } from "react-native-mask-text";
+import email from "react-native-email";
 
 const signupSchema = Yup.object().shape({
   name: Yup.string()
@@ -62,8 +64,8 @@ export const MyForm = () => {
         phone: "1234567",
         countryCode,
       }}
-      onSubmit={(values) => {
-        console.log(values);
+      onSubmit={({ name, phone, email, countryCode }) => {
+        sendEmail(name, email, countryCode + " " + phone);
       }}
       validationSchema={signupSchema}
       validateOnMount
@@ -77,7 +79,6 @@ export const MyForm = () => {
         touched,
         isValid,
         setFieldValue,
-        resetForm,
       }) => (
         <View style={styles.container}>
           <TextInput
@@ -119,15 +120,16 @@ export const MyForm = () => {
               theme={{ ...theme, roundness: 15 }}
             />
             <TextInput
-              onChangeText={(val) =>
-                /^[0-9]{0,13}$/.test(val) && setFieldValue("phone", val)
-              }
+              onChangeText={handleChange("phone")}
               onFocus={handleBlur("phone")}
               value={values.phone}
               theme={{ roundness: 15 }}
               mode="outlined"
               error={touched.phone && errors.phone ? true : false}
               keyboardType="phone-pad"
+              render={(props) => (
+                <MaskedTextInput {...props} mask="999 999 99 99" />
+              )}
             />
           </View>
           <HelperText type="error">{touched.phone && errors.phone}</HelperText>
@@ -164,6 +166,13 @@ export const MyForm = () => {
     </Formik>
   );
 };
+
+function sendEmail(name, mail, phone) {
+  const to = "support@domen.ru";
+  const body = "Имя - " + name + "\nТелефон - " + phone + "\nЕмэйл - " + mail;
+
+  email(to, { subject: "Новая заявка", body });
+}
 
 const styles = StyleSheet.create({
   button: { borderRadius: 30, marginTop: 20 },
