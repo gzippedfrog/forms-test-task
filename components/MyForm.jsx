@@ -1,3 +1,4 @@
+import { useState } from "react";
 import { View, StyleSheet } from "react-native";
 import {
   TextInput,
@@ -5,23 +6,22 @@ import {
   Text,
   HelperText,
   Checkbox,
+  useTheme,
 } from "react-native-paper";
-import { Formik, Form, Field, ErrorMessage } from "formik";
-import * as Yup from "yup";
 import DropDown from "react-native-paper-dropdown";
-import { useState } from "react";
+import { Formik } from "formik";
+import * as Yup from "yup";
 
 const signupSchema = Yup.object().shape({
   name: Yup.string()
     .required("Введите нормальное имя")
-    .test(
-      "test",
-      "Введите нормальное имя",
-      (val) => typeof val === "string" && val.match(/^[а-яА-Я]{3,10}$/)
-    ),
+    .min(3, "Введите нормальное имя")
+    .max(10, "Введите нормальное имя"),
 
   email: Yup.string()
     .required("Введите корректный емэйл")
+    .min(10, "Введите корректный емэйл")
+    .max(30, "Введите корректный емэйл")
     .test(
       "test",
       "Введите корректный емэйл",
@@ -30,24 +30,22 @@ const signupSchema = Yup.object().shape({
 
   phone: Yup.string()
     .required("Введите корректный номер телефона")
-    .test(
-      "test",
-      "Введите корректный номер телефона",
-      (val) => typeof val === "string" && val.match(/^\d{7,13}$/)
-    ),
+    .min(7, "Введите корректный номер телефона")
+    .max(13, "Введите корректный номер телефона"),
 });
 
 export const MyForm = () => {
-  const [checked, setChecked] = useState(true);
+  const theme = useTheme();
   const [showDropDown, setShowDropDown] = useState(false);
+  const [checked, setChecked] = useState(true);
   const [countryCode, setCountryCode] = useState("+7");
   const countryCodes = [
     {
-      label: "+1 USA",
+      label: "+1",
       value: "+1",
     },
     {
-      label: "+7 Russia",
+      label: "+7",
       value: "+7",
     },
     {
@@ -58,7 +56,12 @@ export const MyForm = () => {
 
   return (
     <Formik
-      initialValues={{ name: "семен", email: "svalov@a.com", phone: "1234567" }}
+      initialValues={{
+        name: "юзер",
+        email: "user@mail.com",
+        phone: "1234567",
+        countryCode,
+      }}
       onSubmit={(values) => {
         console.log(values);
       }}
@@ -73,15 +76,20 @@ export const MyForm = () => {
         errors,
         touched,
         isValid,
+        setFieldValue,
+        resetForm,
       }) => (
-        <View>
+        <View style={styles.container}>
           <TextInput
             label="Имя"
-            onChangeText={handleChange("name")}
+            onChangeText={(val) =>
+              /^[а-яА-Я]*$/.test(val) && setFieldValue("name", val)
+            }
             onFocus={handleBlur("name")}
             value={values.name}
             style={styles.textInput}
             mode="outlined"
+            theme={{ roundness: 15 }}
             error={touched.name && errors.name ? true : false}
           />
           <HelperText type="error">{touched.name && errors.name}</HelperText>
@@ -93,6 +101,7 @@ export const MyForm = () => {
             value={values.email}
             style={styles.textInput}
             mode="outlined"
+            theme={{ roundness: 15 }}
             error={touched.email && errors.email ? true : false}
             keyboardType="email-address"
           />
@@ -107,13 +116,15 @@ export const MyForm = () => {
               setValue={setCountryCode}
               list={countryCodes}
               mode={"outlined"}
-              // dropDownStyle={{ width: "100%" }}
+              theme={{ ...theme, roundness: 15 }}
             />
             <TextInput
-              onChangeText={handleChange("phone")}
+              onChangeText={(val) =>
+                /^[0-9]{0,13}$/.test(val) && setFieldValue("phone", val)
+              }
               onFocus={handleBlur("phone")}
               value={values.phone}
-              style={styles.textInput}
+              theme={{ roundness: 15 }}
               mode="outlined"
               error={touched.phone && errors.phone ? true : false}
               keyboardType="phone-pad"
@@ -157,11 +168,12 @@ export const MyForm = () => {
 const styles = StyleSheet.create({
   button: { borderRadius: 30, marginTop: 20 },
   buttonLabel: { fontSize: 20, lineHeight: 40 },
-  phoneInput: {
-    // flex: 1,
-    // flexDirection: "row",
+  text: {
+    flex: 1,
+    flexWrap: "wrap",
+    color: "#8F8F8F",
+    textAlignVertical: "center",
   },
-  text: { color: "#8F8F8F" },
   textUnderlined: {
     color: "#8F8F8F",
     textDecorationLine: "underline",
