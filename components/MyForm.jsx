@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { View, StyleSheet } from "react-native";
+import { View, StyleSheet, TouchableOpacity } from "react-native";
 import {
   TextInput,
   Button,
@@ -13,6 +13,10 @@ import { Formik } from "formik";
 import * as Yup from "yup";
 import { MaskedTextInput } from "react-native-mask-text";
 import email from "react-native-email";
+import axios from "axios";
+
+const DB_URL =
+  "https://form-test-task-rn-default-rtdb.europe-west1.firebasedatabase.app";
 
 const signupSchema = Yup.object().shape({
   name: Yup.string()
@@ -40,32 +44,46 @@ export const MyForm = () => {
   const theme = useTheme();
   const [showDropDown, setShowDropDown] = useState(false);
   const [checked, setChecked] = useState(true);
-  const [countryCode, setCountryCode] = useState("+7");
+  const [countryCode, setCountryCode] = useState("+123");
   const countryCodes = [
     {
       label: "+1",
       value: "+1",
     },
     {
-      label: "+7",
+      label: "7",
       value: "+7",
     },
     {
       label: "+42",
       value: "+42",
     },
+    {
+      label: "+123",
+      value: "+123",
+    },
   ];
 
   return (
     <Formik
       initialValues={{
-        name: "юзер",
-        email: "user@mail.com",
-        phone: "1234567",
+        name: "",
+        email: "",
+        // phone: "",
+        // name: "юзер",
+        // email: "user@mail.com",
+        phone: "123 456 78 90",
         countryCode,
       }}
-      onSubmit={({ name, phone, email, countryCode }) => {
-        sendEmail(name, email, countryCode + " " + phone);
+      onSubmit={async ({ name, phone, email, countryCode }) => {
+        let phoneNumber = countryCode + " " + phone;
+
+        await axios.post(`${DB_URL}/users.json`, {
+          name,
+          email,
+          phone: phoneNumber,
+        });
+        sendEmail(name, email, phoneNumber);
       }}
       validationSchema={signupSchema}
       validateOnMount
@@ -79,6 +97,7 @@ export const MyForm = () => {
         touched,
         isValid,
         setFieldValue,
+        initialValues,
       }) => (
         <View style={styles.container}>
           <TextInput
@@ -108,17 +127,16 @@ export const MyForm = () => {
           />
           <HelperText type="error">{touched.email && errors.email}</HelperText>
 
-          <View style={styles.phoneInput}>
-            <DropDown
-              visible={showDropDown}
-              showDropDown={() => setShowDropDown(true)}
-              onDismiss={() => setShowDropDown(false)}
-              value={countryCode}
-              setValue={setCountryCode}
-              list={countryCodes}
-              mode={"outlined"}
-              theme={{ ...theme, roundness: 15 }}
-            />
+          <View
+            style={[
+              styles.phoneInput,
+              {
+                // position: "relative",
+                // height: 150,
+                // backgroundColor: "blue",
+              },
+            ]}
+          >
             <TextInput
               onChangeText={handleChange("phone")}
               onFocus={handleBlur("phone")}
@@ -127,9 +145,55 @@ export const MyForm = () => {
               mode="outlined"
               error={touched.phone && errors.phone ? true : false}
               keyboardType="phone-pad"
+              style={{
+                position: "absolute",
+                width: "100%",
+                // elevation: -1,
+                paddingLeft: 80,
+                // height: 60,
+              }}
               render={(props) => (
-                <MaskedTextInput {...props} mask="999 999 99 99" />
+                <MaskedTextInput
+                  {...props}
+                  mask="999 999 99 99"
+                  defaultValue={initialValues.phone}
+                />
               )}
+            />
+            {/* <TouchableOpacity
+              style={{
+                position: "absolute",
+                top: 6,
+                height: 58,
+                width: 80,
+              }}
+              onPress={() => setShowDropDown(true)}
+            /> */}
+
+            <DropDown
+              visible={showDropDown}
+              showDropDown={() => setShowDropDown(true)}
+              onDismiss={() => setShowDropDown(false)}
+              value={countryCode}
+              setValue={setCountryCode}
+              list={countryCodes}
+              mode={"outlined"}
+              theme={{
+                ...theme,
+                roundness: 0,
+                colors: {
+                  ...theme.colors,
+                  placeholder: theme.colors.background,
+                },
+              }}
+              inputProps={{
+                style: {
+                  top: 10,
+                  left: 5,
+                  height: 40,
+                  width: 100,
+                },
+              }}
             />
           </View>
           <HelperText type="error">{touched.phone && errors.phone}</HelperText>
