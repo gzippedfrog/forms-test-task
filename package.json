@@ -14,7 +14,6 @@
     "color": "^4.2.0",
     "expo": "~44.0.0",
     "expo-status-bar": "~1.2.0",
-    "firebase": "8.2.3",
     "formik": "^2.2.9",
     "react": "17.0.1",
     "react-dom": "17.0.1",
@@ -22,9 +21,11 @@
     "react-native-element-dropdown": "^1.6.1",
     "react-native-mask-text": "^0.7.0",
     "react-native-paper": "^4.11.2",
+    "react-native-ui-lib": "^6.9.1",
+    "react-native-reanimated": "^2.3.1",
+    "react-native-gesture-handler": "^2.1.0",
     "react-native-web": "0.17.1",
-    "yup": "^0.32.11",
-    "expo-mail-composer": "~11.1.0"
+    "yup": "^0.32.11"
   },
   "devDependencies": {
     "@babel/core": "^7.12.9",

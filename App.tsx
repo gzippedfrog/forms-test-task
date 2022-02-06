@@ -10,7 +10,6 @@ import {
   Provider as PaperProvider,
   DarkTheme,
   Appbar,
-  DefaultTheme,
 } from "react-native-paper";
 
 let theme = {
@@ -20,6 +19,7 @@ let theme = {
     primary: "#0063FF",
     error: "#DE494A",
     background: "#1F1F1F",
+    disabled: "#8F8F8F",
   },
 };
 

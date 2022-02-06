@@ -5,7 +5,6 @@ import {
   Button,
   Text,
   HelperText,
-  Checkbox,
   useTheme,
 } from "react-native-paper";
 import { Formik } from "formik";
@@ -15,6 +14,7 @@ import axios from "axios";
 import { Dropdown } from "react-native-element-dropdown";
 import data from "../countryCodes";
 import { composeAsync } from "expo-mail-composer";
+import Checkbox from "react-native-ui-lib/checkbox";
 
 const DB_URL =
   "https://form-test-task-rn-default-rtdb.europe-west1.firebasedatabase.app";
@@ -51,15 +51,15 @@ export const MyForm = () => {
   return (
     <Formik
       initialValues={{
-        // name: "",
-        // email: "",
-        // countryCode: "+7",
-        // phoneNumber: "",
-
-        name: "юзер",
-        email: "user@mail.com",
+        name: "",
+        email: "",
         countryCode: "+7",
-        phoneNumber: "123 456 78 90",
+        phoneNumber: "",
+
+        // name: "юзер",
+        // email: "user@mail.com",
+        // countryCode: "+7",
+        // phoneNumber: "123 456 78 90",
       }}
       onSubmit={async ({ name, email, countryCode, phoneNumber }) => {
         const phoneWithCountryCode = countryCode + " " + phoneNumber;
@@ -97,6 +97,7 @@ export const MyForm = () => {
       }) => (
         <View>
           <TextInput
+            // label={<Text style={{ color: theme.colors.disabled }}>Имя</Text>}
             label="Имя"
             onChangeText={(val) =>
               /^[а-яА-Я]*$/.test(val) && setFieldValue("name", val)
@@ -219,10 +220,12 @@ export const MyForm = () => {
 
           <View style={{ flexDirection: "row", marginTop: 20 }}>
             <Checkbox
-              status={checked ? "checked" : "unchecked"}
-              onPress={() => {
-                setChecked(!checked);
-              }}
+              value={checked}
+              onValueChange={setChecked}
+              color={theme.colors.disabled}
+              iconColor={theme.colors.disabled}
+              style={{ borderRadius: 5, top: 5, borderWidth: 1 }}
+              outline={true}
             />
 
             <Text style={[styles.text]}>
@@ -276,7 +279,7 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "center",
-    paddingHorizontal: 10,
+    paddingHorizontal: 15,
     paddingVertical: 20,
   },
 });
