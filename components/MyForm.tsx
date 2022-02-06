@@ -38,7 +38,7 @@ const signupSchema = Yup.object().shape({
   phone: Yup.string()
     .required("Введите корректный номер телефона")
     .min(8, "Введите корректный номер телефона")
-    .max(17, "Введите корректный номер телефона"),
+    .max(18, "Введите корректный номер телефона"),
 });
 
 export const MyForm = () => {
@@ -51,14 +51,14 @@ export const MyForm = () => {
   return (
     <Formik
       initialValues={{
-        // name: "",
-        name: "юзер",
+        name: "",
+        // name: "юзер",
 
-        // email: "",
-        email: "user@mail.com",
+        email: "",
+        // email: "user@mail.com",
 
-        // phone: "",
-        phone: "123 456 78 90",
+        phone: "",
+        // phone: "123 456 78 90",
 
         countryCode,
       }}
@@ -73,8 +73,6 @@ export const MyForm = () => {
         sendEmail(name, email, phoneNumber);
       }}
       validationSchema={signupSchema}
-      validateOnMount
-      validateOnChange
     >
       {({
         handleChange,
@@ -113,8 +111,9 @@ export const MyForm = () => {
           />
           <HelperText type="error">{touched.email && errors.email}</HelperText>
 
-          <View style={{ width: "100%" }}>
+          <View>
             <TextInput
+              label="Телефон"
               onChangeText={handleChange("phone")}
               onFocus={handleBlur("phone")}
               value={values.phone}
@@ -128,7 +127,7 @@ export const MyForm = () => {
               render={(props) => (
                 <MaskedTextInput
                   {...props}
-                  mask="999 999 99 99 99"
+                  mask="999 999 99 99 99 9"
                   defaultValue={initialValues.phone}
                 />
               )}
@@ -136,7 +135,25 @@ export const MyForm = () => {
             <Dropdown
               data={data}
               maxHeight={300}
-              labelField="label"
+              renderItem={({ value, country }) => {
+                return (
+                  <View
+                    style={{
+                      flexDirection: "row",
+                      justifyContent: "space-between",
+                      alignItems: "center",
+                      paddingHorizontal: 10,
+                      paddingVertical: 20,
+                    }}
+                  >
+                    <Text style={{ fontSize: 16 }}>{country}</Text>
+                    <Text style={{ fontSize: 16, paddingLeft: 10 }}>
+                      {value}
+                    </Text>
+                  </View>
+                );
+              }}
+              labelField="value"
               valueField="value"
               dropdownPosition="bottom"
               selectedTextProps={{
@@ -145,20 +162,22 @@ export const MyForm = () => {
               autoScroll={false}
               activeColor="#333"
               style={{
-                width: 90,
+                width: 95,
                 position: "absolute",
-                paddingLeft: 10,
+                paddingLeft: 15,
                 top: 17,
               }}
               selectedTextStyle={{
-                color: "white",
+                color: theme.colors.disabled,
               }}
               containerStyle={{
                 width: Math.min(width, 500) - 40,
                 backgroundColor: theme.colors.background,
                 elevation: 0,
                 borderWidth: 1,
-                borderColor: theme.colors.disabled,
+                borderColor: errors.phone
+                  ? theme.colors.error
+                  : theme.colors.disabled,
                 borderBottomLeftRadius: 15,
                 borderBottomRightRadius: 15,
                 top: -35,
@@ -227,7 +246,11 @@ function sendEmail(name: string, mail: string, phone: string) {
 }
 
 const styles = StyleSheet.create({
-  button: { borderRadius: 30, marginTop: 20, marginHorizontal: 1 },
+  button: {
+    borderRadius: 30,
+    marginTop: 10,
+    marginHorizontal: 1,
+  },
   buttonLabel: { fontSize: 20, lineHeight: 40 },
   text: {
     flex: 1,

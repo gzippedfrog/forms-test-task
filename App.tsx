@@ -23,8 +23,6 @@ let theme = {
   },
 };
 
-// theme = DefaultTheme;
-
 export default function App() {
   const { width } = useWindowDimensions();
 
@@ -53,7 +51,7 @@ export default function App() {
 const styles = StyleSheet.create({
   container: {
     paddingHorizontal: 20,
-    // paddingBottom: 500,
+    paddingBottom: 20,
     alignSelf: "center",
   },
   header: {
