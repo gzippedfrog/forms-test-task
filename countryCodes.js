@@ -369,7 +369,7 @@ export default [
     value: "+509",
   },
   {
-    country: "Holy See (Vatican City State)      +379",
+    country: "Holy See (Vatican City State)",
     value: "+379",
   },
   {

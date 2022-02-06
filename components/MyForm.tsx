@@ -122,7 +122,7 @@ export const MyForm = () => {
               error={touched.phone && errors.phone ? true : false}
               keyboardType="phone-pad"
               style={{
-                paddingLeft: 110,
+                paddingLeft: 100,
               }}
               render={(props) => (
                 <MaskedTextInput
@@ -132,9 +132,10 @@ export const MyForm = () => {
                 />
               )}
             />
+
             <Dropdown
               data={data}
-              maxHeight={300}
+              maxHeight={250}
               renderItem={({ value, country }) => {
                 return (
                   <View
@@ -146,10 +147,10 @@ export const MyForm = () => {
                       paddingVertical: 20,
                     }}
                   >
-                    <Text style={{ fontSize: 16 }}>{country}</Text>
-                    <Text style={{ fontSize: 16, paddingLeft: 10 }}>
-                      {value}
+                    <Text style={{ fontSize: 16, width: "50%" }}>
+                      {country}
                     </Text>
+                    <Text style={{ fontSize: 16 }}>{value}</Text>
                   </View>
                 );
               }}
@@ -162,7 +163,7 @@ export const MyForm = () => {
               autoScroll={false}
               activeColor="#333"
               style={{
-                width: 95,
+                width: 90,
                 position: "absolute",
                 paddingLeft: 15,
                 top: 17,
@@ -175,11 +176,13 @@ export const MyForm = () => {
                 backgroundColor: theme.colors.background,
                 elevation: 0,
                 borderWidth: 1,
-                borderColor: errors.phone
-                  ? theme.colors.error
-                  : theme.colors.disabled,
+                borderColor:
+                  errors.phone && touched.phone
+                    ? theme.colors.error
+                    : theme.colors.disabled,
                 borderBottomLeftRadius: 15,
                 borderBottomRightRadius: 15,
+                paddingBottom: 12,
                 top: -35,
               }}
               value={countryCode}
@@ -191,13 +194,14 @@ export const MyForm = () => {
                 setIsFocus(false);
               }}
             />
-            <View
+
+            <View //  Separator
               style={{
                 position: "absolute",
                 width: 10,
                 height: 15,
                 top: 29,
-                left: 100,
+                left: 90,
                 borderRightWidth: 1,
                 borderRightColor: theme.colors.disabled,
               }}
