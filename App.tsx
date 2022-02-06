@@ -10,9 +10,10 @@ import {
   Provider as PaperProvider,
   DarkTheme,
   Appbar,
+  DefaultTheme,
 } from "react-native-paper";
 
-const theme = {
+let theme = {
   ...DarkTheme,
   colors: {
     ...DarkTheme.colors,
@@ -22,12 +23,14 @@ const theme = {
   },
 };
 
+// theme = DefaultTheme;
+
 export default function App() {
   const { width } = useWindowDimensions();
 
   return (
     <PaperProvider theme={theme}>
-      <StatusBar style="light" />
+      <StatusBar style="light" backgroundColor={theme.colors.background} />
       <Appbar.Header style={styles.header}>
         <Appbar.BackAction />
       </Appbar.Header>
@@ -50,7 +53,7 @@ export default function App() {
 const styles = StyleSheet.create({
   container: {
     paddingHorizontal: 20,
-    paddingBottom: 20,
+    // paddingBottom: 500,
     alignSelf: "center",
   },
   header: {

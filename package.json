@@ -11,6 +11,7 @@
   },
   "dependencies": {
     "axios": "^0.25.0",
+    "color": "^4.2.0",
     "expo": "~44.0.0",
     "expo-status-bar": "~1.2.0",
     "firebase": "8.2.3",
@@ -18,16 +19,22 @@
     "react": "17.0.1",
     "react-dom": "17.0.1",
     "react-native": "0.64.3",
+    "react-native-element-dropdown": "^1.6.1",
     "react-native-email": "^1.1.0",
     "react-native-mask-text": "^0.7.0",
     "react-native-paper": "^4.11.2",
     "react-native-paper-dropdown": "^1.0.7",
-    "react-native-text-input-mask": "^3.1.4",
     "react-native-web": "0.17.1",
+    "sharingan-rn-modal-dropdown": "^1.4.0",
     "yup": "^0.32.11"
   },
   "devDependencies": {
-    "@babel/core": "^7.12.9"
+    "@babel/core": "^7.12.9",
+    "@types/jest": "^27.4.0",
+    "@types/react": "^17.0.39",
+    "@types/react-native": "^0.66.15",
+    "@types/react-test-renderer": "^17.0.1",
+    "typescript": "^4.5.5"
   },
   "private": true
 }
