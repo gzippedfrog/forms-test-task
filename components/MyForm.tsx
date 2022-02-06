@@ -29,50 +29,57 @@ const signupSchema = Yup.object().shape({
     .required("Введите корректный емэйл")
     .min(10, "Введите корректный емэйл")
     .max(30, "Введите корректный емэйл")
-    .test("test", "Введите корректный емэйл", (val) => {
-      if (typeof val !== "string") return;
-      return val.match(/@\w+\.\w+$/);
-    }),
+    .test(
+      "test",
+      "Введите корректный емэйл",
+      (val) => val && val.match(/@\w+\.\w+$/)
+    ),
 
-  phone: Yup.string()
+  phoneNumber: Yup.string()
     .required("Введите корректный номер телефона")
     .min(8, "Введите корректный номер телефона")
     .max(18, "Введите корректный номер телефона"),
 });
 
 export const MyForm = () => {
-  const theme = useTheme();
   const [checked, setChecked] = useState(true);
-  const [countryCode, setCountryCode] = useState("+7");
   const [isFocus, setIsFocus] = useState(false);
+
+  const theme = useTheme();
   const { width } = useWindowDimensions();
 
   return (
     <Formik
       initialValues={{
-        name: "",
-        email: "",
-        phone: "",
+        // name: "",
+        // email: "",
+        // countryCode: "+7",
+        // phoneNumber: "",
 
-        // name: "юзер",
-        // email: "user@mail.com",
-        // phone: "123 456 78 90",
-
-        countryCode,
+        name: "юзер",
+        email: "user@mail.com",
+        countryCode: "+7",
+        phoneNumber: "123 456 78 90",
       }}
-      onSubmit={async ({ name, phone, email, countryCode }) => {
-        let phoneNumber = countryCode + " " + phone;
+      onSubmit={async ({ name, email, countryCode, phoneNumber }) => {
+        const phoneWithCountryCode = countryCode + " " + phoneNumber;
 
         await axios.post(`${DB_URL}/users.json`, {
           name,
           email,
-          phone: phoneNumber,
+          phone: phoneWithCountryCode,
         });
 
         composeAsync({
           subject: "Новая заявка",
           recipients: ["support@domen.ru"],
-          body: "Имя - " + name + "\nТелефон - " + phone + "\nЕмэйл - " + email,
+          body:
+            "Имя - " +
+            name +
+            "\nТелефон - " +
+            phoneWithCountryCode +
+            "\nЕмэйл - " +
+            email,
         });
       }}
       validationSchema={signupSchema}
@@ -117,12 +124,12 @@ export const MyForm = () => {
           <View>
             <TextInput
               label="Телефон"
-              onChangeText={handleChange("phone")}
-              onFocus={handleBlur("phone")}
-              value={values.phone}
+              onChangeText={handleChange("phoneNumber")}
+              onFocus={handleBlur("phoneNumber")}
+              value={values.phoneNumber}
               theme={{ roundness: 15 }}
               mode="outlined"
-              error={touched.phone && errors.phone ? true : false}
+              error={touched.phoneNumber && errors.phoneNumber ? true : false}
               keyboardType="phone-pad"
               style={{
                 paddingLeft: 100,
@@ -131,7 +138,7 @@ export const MyForm = () => {
                 <MaskedTextInput
                   {...props}
                   mask="999 999 99 99 99 9"
-                  defaultValue={initialValues.phone}
+                  defaultValue={initialValues.phoneNumber}
                 />
               )}
             />
@@ -141,15 +148,7 @@ export const MyForm = () => {
               maxHeight={250}
               renderItem={({ value, country }) => {
                 return (
-                  <View
-                    style={{
-                      flexDirection: "row",
-                      justifyContent: "space-between",
-                      alignItems: "center",
-                      paddingHorizontal: 10,
-                      paddingVertical: 20,
-                    }}
-                  >
+                  <View style={styles.dropdownItem}>
                     <Text style={{ fontSize: 16, width: "50%" }}>
                       {country}
                     </Text>
@@ -165,12 +164,7 @@ export const MyForm = () => {
               }}
               autoScroll={false}
               activeColor="#333"
-              style={{
-                width: 90,
-                position: "absolute",
-                paddingLeft: 15,
-                top: 17,
-              }}
+              style={styles.dropdown}
               selectedTextStyle={{
                 color: theme.colors.disabled,
               }}
@@ -179,38 +173,38 @@ export const MyForm = () => {
                 backgroundColor: theme.colors.background,
                 elevation: 0,
                 borderWidth: 1,
-                borderColor:
-                  errors.phone && touched.phone
-                    ? theme.colors.error
-                    : theme.colors.disabled,
                 borderBottomLeftRadius: 15,
                 borderBottomRightRadius: 15,
                 paddingBottom: 12,
                 top: -35,
+                borderColor:
+                  errors.phoneNumber && touched.phoneNumber
+                    ? theme.colors.error
+                    : theme.colors.disabled,
               }}
-              value={countryCode}
+              value={values.countryCode}
               onFocus={() => setIsFocus(true)}
               onBlur={() => setIsFocus(false)}
               onChange={({ value }) => {
-                setCountryCode(value);
                 handleChange("countryCode")(value);
                 setIsFocus(false);
               }}
             />
 
-            <View //  Separator
-              style={{
-                position: "absolute",
-                width: 10,
-                height: 15,
-                top: 29,
-                left: 90,
-                borderRightWidth: 1,
-                borderRightColor: theme.colors.disabled,
-              }}
+            {/* Separator */}
+            <View
+              style={[
+                styles.separator,
+                {
+                  borderRightColor: theme.colors.disabled,
+                },
+              ]}
             />
           </View>
-          <HelperText type="error">{touched.phone && errors.phone}</HelperText>
+
+          <HelperText type="error">
+            {touched.phoneNumber && errors.phoneNumber}
+          </HelperText>
 
           <Button
             onPress={handleSubmit}
@@ -230,7 +224,8 @@ export const MyForm = () => {
                 setChecked(!checked);
               }}
             />
-            <Text style={[styles.text, { marginLeft: 20 }]}>
+
+            <Text style={[styles.text]}>
               {"Регистрируясь, вы соглашаетесь с нашими "}
               <Text style={styles.textUnderlined}>Условиями использования</Text>
               {" и "}
@@ -257,9 +252,31 @@ const styles = StyleSheet.create({
     flexWrap: "wrap",
     color: "#8F8F8F",
     textAlignVertical: "center",
+    marginLeft: 15,
   },
   textUnderlined: {
     color: "#8F8F8F",
     textDecorationLine: "underline",
+  },
+  separator: {
+    position: "absolute",
+    width: 10,
+    height: 15,
+    top: 29,
+    left: 90,
+    borderRightWidth: 1,
+  },
+  dropdown: {
+    width: 90,
+    position: "absolute",
+    paddingLeft: 15,
+    top: 17,
+  },
+  dropdownItem: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    paddingHorizontal: 10,
+    paddingVertical: 20,
   },
 });
