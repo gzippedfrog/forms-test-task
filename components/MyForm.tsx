@@ -11,10 +11,10 @@ import {
 import { Formik } from "formik";
 import * as Yup from "yup";
 import { MaskedTextInput } from "react-native-mask-text";
-import email from "react-native-email";
 import axios from "axios";
 import { Dropdown } from "react-native-element-dropdown";
 import data from "../countryCodes";
+import { composeAsync } from "expo-mail-composer";
 
 const DB_URL =
   "https://form-test-task-rn-default-rtdb.europe-west1.firebasedatabase.app";
@@ -30,9 +30,8 @@ const signupSchema = Yup.object().shape({
     .min(10, "Введите корректный емэйл")
     .max(30, "Введите корректный емэйл")
     .test("test", "Введите корректный емэйл", (val) => {
-      if (typeof val === "string") {
-        return val.match(/@\w+\.\w+$/);
-      }
+      if (typeof val !== "string") return;
+      return val.match(/@\w+\.\w+$/);
     }),
 
   phone: Yup.string()
@@ -52,12 +51,11 @@ export const MyForm = () => {
     <Formik
       initialValues={{
         name: "",
-        // name: "юзер",
-
         email: "",
-        // email: "user@mail.com",
-
         phone: "",
+
+        // name: "юзер",
+        // email: "user@mail.com",
         // phone: "123 456 78 90",
 
         countryCode,
@@ -70,7 +68,12 @@ export const MyForm = () => {
           email,
           phone: phoneNumber,
         });
-        sendEmail(name, email, phoneNumber);
+
+        composeAsync({
+          subject: "Новая заявка",
+          recipients: ["support@domen.ru"],
+          body: "Имя - " + name + "\nТелефон - " + phone + "\nЕмэйл - " + email,
+        });
       }}
       validationSchema={signupSchema}
     >
@@ -241,13 +244,6 @@ export const MyForm = () => {
     </Formik>
   );
 };
-
-function sendEmail(name: string, mail: string, phone: string) {
-  const to = "support@domen.ru";
-  const body = "Имя - " + name + "\nТелефон - " + phone + "\nЕмэйл - " + mail;
-
-  email(to, { subject: "Новая заявка", body });
-}
 
 const styles = StyleSheet.create({
   button: {
