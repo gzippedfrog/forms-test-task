@@ -5,12 +5,12 @@ import {
   Text,
   useWindowDimensions,
 } from "react-native";
-import { MyForm } from "./components/MyForm";
 import {
   Provider as PaperProvider,
   DarkTheme,
   Appbar,
 } from "react-native-paper";
+import { MyForm } from "./components/MyForm";
 
 let theme = {
   ...DarkTheme,

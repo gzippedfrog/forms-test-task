@@ -32,7 +32,7 @@ const signupSchema = Yup.object().shape({
     .test(
       "test",
       "Введите корректный емэйл",
-      (val) => val && val.match(/@\w+\.\w+$/)
+      (val) => typeof val === "string" && /@\w+\.\w+$/.test(val)
     ),
 
   phoneNumber: Yup.string()
@@ -83,6 +83,7 @@ export const MyForm = () => {
         });
       }}
       validationSchema={signupSchema}
+      validateOnMount
     >
       {({
         handleChange,
@@ -97,7 +98,6 @@ export const MyForm = () => {
       }) => (
         <View>
           <TextInput
-            // label={<Text style={{ color: theme.colors.disabled }}>Имя</Text>}
             label="Имя"
             onChangeText={(val) =>
               /^[а-яА-Я]*$/.test(val) && setFieldValue("name", val)

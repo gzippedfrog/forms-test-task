@@ -1,7 +1,6 @@
 export default [
   {
     country: "Afghanistan",
-    // country: "Congo, The Democratic Republic of the Congo",
     value: "+93",
   },
   {
