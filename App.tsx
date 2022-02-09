@@ -17,23 +17,21 @@ let theme = {
   },
 };
 
-export default () => {
-  return (
-    <PaperProvider theme={theme}>
-      <StatusBar backgroundColor={theme.colors.background} />
-      <Appbar.Header style={styles.header}>
-        <Appbar.BackAction />
-      </Appbar.Header>
-      <ScrollView
-        style={{ backgroundColor: theme.colors.background }}
-        contentContainerStyle={[styles.container]}
-      >
-        <Text style={styles.heading}>Создать аккаунт</Text>
-        <MyForm />
-      </ScrollView>
-    </PaperProvider>
-  );
-};
+export default () => (
+  <PaperProvider theme={theme}>
+    <StatusBar backgroundColor={theme.colors.background} />
+    <Appbar.Header style={styles.header}>
+      <Appbar.BackAction />
+    </Appbar.Header>
+    <ScrollView
+      style={{ backgroundColor: theme.colors.background }}
+      contentContainerStyle={[styles.container]}
+    >
+      <Text style={styles.heading}>Создать аккаунт</Text>
+      <MyForm />
+    </ScrollView>
+  </PaperProvider>
+);
 
 const styles = StyleSheet.create({
   container: {

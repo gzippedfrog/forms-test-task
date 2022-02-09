@@ -10,11 +10,11 @@ import {
 import { Formik } from "formik";
 import * as Yup from "yup";
 import { MaskedTextInput } from "react-native-mask-text";
-import axios from "axios";
 import { Dropdown } from "react-native-element-dropdown";
-import data from "../countryCodes";
 import { Checkbox } from "react-native-ui-lib";
 import { composeAsync } from "expo-mail-composer";
+import axios from "axios";
+import data from "../countryCodes";
 
 const DB_URL =
   "https://form-test-task-rn-default-rtdb.europe-west1.firebasedatabase.app";
@@ -70,17 +70,14 @@ export default () => {
           phone: phoneWithCountryCode,
         });
 
-        composeAsync(
-          {
-            subject: "Новая заявка",
-            recipients: ["support@domen.ru"],
-            body:
-              `Имя - ${name}\n` +
-              `Телефон - ${phoneWithCountryCode}\n` +
-              `Емэйл - ${email}`,
-          },
-          null
-        );
+        composeAsync({
+          subject: "Новая заявка",
+          recipients: ["support@domen.ru"],
+          body:
+            `Имя - ${name}\n` +
+            `Телефон - ${phoneWithCountryCode}\n` +
+            `Емэйл - ${email}`,
+        });
       }}
       validationSchema={signupSchema}
     >
@@ -135,6 +132,7 @@ export default () => {
                 paddingLeft: 100,
               }}
               render={(props) => (
+                // @ts-ignore
                 <MaskedTextInput
                   {...props}
                   mask="999 999 99 99 99 9"
@@ -254,9 +252,8 @@ export default () => {
 
 const styles = StyleSheet.create({
   button: {
-    borderRadius: 30,
+    borderRadius: 999,
     marginTop: 10,
-    marginHorizontal: 1,
   },
   buttonLabel: {
     fontSize: 20,
