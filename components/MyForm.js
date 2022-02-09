@@ -1,4 +1,4 @@
-import { useState } from "react";
+import React, { useState } from "react";
 import { View, StyleSheet, useWindowDimensions } from "react-native";
 import {
   TextInput,
@@ -13,8 +13,8 @@ import { MaskedTextInput } from "react-native-mask-text";
 import axios from "axios";
 import { Dropdown } from "react-native-element-dropdown";
 import data from "../countryCodes";
+import { Checkbox } from "react-native-ui-lib";
 import { composeAsync } from "expo-mail-composer";
-import Checkbox from "react-native-ui-lib/checkbox";
 
 const DB_URL =
   "https://form-test-task-rn-default-rtdb.europe-west1.firebasedatabase.app";
@@ -32,7 +32,7 @@ const signupSchema = Yup.object().shape({
     .test(
       "test",
       "Введите корректный емэйл",
-      (val) => typeof val === "string" && /@\w+\.\w+$/.test(val)
+      (val) => !!val && /@\w+\.\w+$/.test(val)
     ),
 
   phoneNumber: Yup.string()
@@ -41,11 +41,11 @@ const signupSchema = Yup.object().shape({
     .max(18, "Введите корректный номер телефона"),
 });
 
-export const MyForm = () => {
+export default () => {
   const [checked, setChecked] = useState(true);
   const [isFocus, setIsFocus] = useState(false);
 
-  const theme = useTheme();
+  const { colors } = useTheme();
   const { width } = useWindowDimensions();
 
   return (
@@ -53,13 +53,13 @@ export const MyForm = () => {
       initialValues={{
         name: "",
         email: "",
-        countryCode: "+7",
         phoneNumber: "",
 
         // name: "юзер",
         // email: "user@mail.com",
-        // countryCode: "+7",
         // phoneNumber: "123 456 78 90",
+
+        countryCode: "+7",
       }}
       onSubmit={async ({ name, email, countryCode, phoneNumber }) => {
         const phoneWithCountryCode = countryCode + " " + phoneNumber;
@@ -70,37 +70,35 @@ export const MyForm = () => {
           phone: phoneWithCountryCode,
         });
 
-        composeAsync({
-          subject: "Новая заявка",
-          recipients: ["support@domen.ru"],
-          body:
-            "Имя - " +
-            name +
-            "\nТелефон - " +
-            phoneWithCountryCode +
-            "\nЕмэйл - " +
-            email,
-        });
+        composeAsync(
+          {
+            subject: "Новая заявка",
+            recipients: ["support@domen.ru"],
+            body:
+              `Имя - ${name}\n` +
+              `Телефон - ${phoneWithCountryCode}\n` +
+              `Емэйл - ${email}`,
+          },
+          null
+        );
       }}
       validationSchema={signupSchema}
-      validateOnMount
     >
       {({
         handleChange,
         handleBlur,
         handleSubmit,
+        setFieldValue,
         values,
         errors,
         touched,
         isValid,
-        setFieldValue,
-        initialValues,
       }) => (
         <View>
           <TextInput
             label="Имя"
             onChangeText={(val) =>
-              /^[а-яА-Я]*$/.test(val) && setFieldValue("name", val)
+              /[^а-яА-Я]+/.test(val) || setFieldValue("name", val)
             }
             onFocus={handleBlur("name")}
             value={values.name}
@@ -127,6 +125,7 @@ export const MyForm = () => {
               label="Телефон"
               onChangeText={handleChange("phoneNumber")}
               onFocus={handleBlur("phoneNumber")}
+              disableFullscreenUI={true}
               value={values.phoneNumber}
               theme={{ roundness: 15 }}
               mode="outlined"
@@ -139,7 +138,7 @@ export const MyForm = () => {
                 <MaskedTextInput
                   {...props}
                   mask="999 999 99 99 99 9"
-                  defaultValue={initialValues.phoneNumber}
+                  defaultValue={values.phoneNumber}
                 />
               )}
             />
@@ -150,7 +149,7 @@ export const MyForm = () => {
               renderItem={({ value, country }) => {
                 return (
                   <View style={styles.dropdownItem}>
-                    <Text style={{ fontSize: 16, width: "50%" }}>
+                    <Text style={{ fontSize: 16, width: "70%" }}>
                       {country}
                     </Text>
                     <Text style={{ fontSize: 16 }}>{value}</Text>
@@ -167,21 +166,21 @@ export const MyForm = () => {
               activeColor="#333"
               style={styles.dropdown}
               selectedTextStyle={{
-                color: theme.colors.disabled,
+                color: colors.disabled,
               }}
               containerStyle={{
-                width: Math.min(width, 500) - 40,
-                backgroundColor: theme.colors.background,
+                width: Math.min(width, 433) - 40,
+                backgroundColor: colors.background,
                 elevation: 0,
                 borderWidth: 1,
                 borderBottomLeftRadius: 15,
                 borderBottomRightRadius: 15,
                 paddingBottom: 12,
-                top: -35,
+                top: 10,
                 borderColor:
-                  errors.phoneNumber && touched.phoneNumber
-                    ? theme.colors.error
-                    : theme.colors.disabled,
+                  touched.phoneNumber && errors.phoneNumber
+                    ? colors.error
+                    : colors.disabled,
               }}
               value={values.countryCode}
               onFocus={() => setIsFocus(true)}
@@ -192,15 +191,25 @@ export const MyForm = () => {
               }}
             />
 
-            {/* Separator */}
-            <View
-              style={[
-                styles.separator,
-                {
-                  borderRightColor: theme.colors.disabled,
-                },
-              ]}
-            />
+            <View style={[styles.separator, { borderRightColor: "#555" }]} />
+
+            {isFocus && (
+              <View
+                style={{
+                  width: "100%",
+                  position: "absolute",
+                  height: 15,
+                  bottom: 0,
+                  borderWidth: 1,
+                  borderTopWidth: 0,
+                  backgroundColor: colors.background,
+                  borderColor:
+                    touched.phoneNumber && errors.phoneNumber
+                      ? colors.error
+                      : colors.disabled,
+                }}
+              />
+            )}
           </View>
 
           <HelperText type="error">
@@ -218,13 +227,13 @@ export const MyForm = () => {
             Далее
           </Button>
 
-          <View style={{ flexDirection: "row", marginTop: 20 }}>
+          <View style={styles.checkboxContainer}>
             <Checkbox
               value={checked}
               onValueChange={setChecked}
-              color={theme.colors.disabled}
-              iconColor={theme.colors.disabled}
-              style={{ borderRadius: 5, top: 5, borderWidth: 1 }}
+              color={colors.disabled}
+              iconColor={colors.disabled}
+              style={styles.checkbox}
               outline={true}
             />
 
@@ -249,7 +258,10 @@ const styles = StyleSheet.create({
     marginTop: 10,
     marginHorizontal: 1,
   },
-  buttonLabel: { fontSize: 20, lineHeight: 40 },
+  buttonLabel: {
+    fontSize: 20,
+    lineHeight: 40,
+  },
   text: {
     flex: 1,
     flexWrap: "wrap",
@@ -263,10 +275,9 @@ const styles = StyleSheet.create({
   },
   separator: {
     position: "absolute",
-    width: 10,
-    height: 15,
-    top: 29,
-    left: 90,
+    height: 24,
+    top: 23,
+    left: 100,
     borderRightWidth: 1,
   },
   dropdown: {
@@ -281,5 +292,18 @@ const styles = StyleSheet.create({
     alignItems: "center",
     paddingHorizontal: 15,
     paddingVertical: 20,
+  },
+  phoneInputFocused: {
+    borderBottomLeftRadius: 0,
+    borderBottomRightRadius: 0,
+  },
+  checkboxContainer: {
+    flexDirection: "row",
+    marginTop: 20,
+  },
+  checkbox: {
+    borderRadius: 5,
+    top: 5,
+    borderWidth: 1,
   },
 });

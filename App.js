@@ -1,16 +1,10 @@
-import { StatusBar } from "expo-status-bar";
-import {
-  ScrollView,
-  StyleSheet,
-  Text,
-  useWindowDimensions,
-} from "react-native";
+import { ScrollView, StatusBar, StyleSheet, Text } from "react-native";
 import {
   Provider as PaperProvider,
   DarkTheme,
   Appbar,
 } from "react-native-paper";
-import { MyForm } from "./components/MyForm";
+import MyForm from "./components/MyForm";
 
 let theme = {
   ...DarkTheme,
@@ -23,36 +17,31 @@ let theme = {
   },
 };
 
-export default function App() {
-  const { width } = useWindowDimensions();
-
+export default () => {
   return (
     <PaperProvider theme={theme}>
-      <StatusBar style="light" backgroundColor={theme.colors.background} />
+      <StatusBar backgroundColor={theme.colors.background} />
       <Appbar.Header style={styles.header}>
         <Appbar.BackAction />
       </Appbar.Header>
       <ScrollView
-        style={{
-          backgroundColor: theme.colors.background,
-        }}
-        contentContainerStyle={[
-          styles.container,
-          { width: Math.min(500, width) },
-        ]}
+        style={{ backgroundColor: theme.colors.background }}
+        contentContainerStyle={[styles.container]}
       >
         <Text style={styles.heading}>Создать аккаунт</Text>
         <MyForm />
       </ScrollView>
     </PaperProvider>
   );
-}
+};
 
 const styles = StyleSheet.create({
   container: {
     paddingHorizontal: 20,
     paddingBottom: 20,
     alignSelf: "center",
+    width: "100%",
+    maxWidth: 433,
   },
   header: {
     backgroundColor: theme.colors.background,
