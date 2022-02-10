@@ -7,17 +7,16 @@ import {
   HelperText,
   useTheme,
 } from "react-native-paper";
+import { Checkbox } from "react-native-ui-lib";
+import { Dropdown } from "react-native-element-dropdown";
+import { MaskedTextInput, MaskedTextInputProps } from "react-native-mask-text";
+import { openComposer } from "react-native-email-link";
 import { Formik } from "formik";
 import * as Yup from "yup";
-import { MaskedTextInput } from "react-native-mask-text";
-import axios from "axios";
-import { Dropdown } from "react-native-element-dropdown";
-import data from "../countryCodes";
-import { Checkbox } from "react-native-ui-lib";
-import { openComposer } from "react-native-email-link";
+import data from "./countryCodes";
 
 const DB_URL =
-  "https://form-test-task-rn-default-rtdb.europe-west1.firebasedatabase.app";
+  "https://form-test-task-rn-default-rtdb.europe-west1.firebasedatabase.app/users.json";
 
 const signupSchema = Yup.object().shape({
   name: Yup.string()
@@ -43,7 +42,7 @@ const signupSchema = Yup.object().shape({
 
 export default () => {
   const [checked, setChecked] = useState(true);
-  const [isFocus, setIsFocus] = useState(false);
+  const [isDropdownOpened, setIsDropdownOpened] = useState(false);
 
   const { colors } = useTheme();
   const { width } = useWindowDimensions();
@@ -58,16 +57,18 @@ export default () => {
         // name: "юзер",
         // email: "user@mail.com",
         // phoneNumber: "123 456 78 90",
-
         countryCode: "+7",
       }}
       onSubmit={async ({ name, email, countryCode, phoneNumber }) => {
         const phoneWithCountryCode = countryCode + " " + phoneNumber;
 
-        await axios.post(`${DB_URL}/users.json`, {
-          name,
-          email,
-          phone: phoneWithCountryCode,
+        await fetch(DB_URL, {
+          method: "POST",
+          body: JSON.stringify({
+            name,
+            email,
+            phone: phoneWithCountryCode,
+          }),
         });
 
         openComposer({
@@ -85,35 +86,36 @@ export default () => {
         handleChange,
         handleBlur,
         handleSubmit,
+        setFieldValue,
+        initialValues,
         values,
         errors,
         touched,
         isValid,
-        setFieldValue,
-        initialValues,
       }) => (
         <View>
+          <Text style={styles.heading}>Создать аккаунт</Text>
           <TextInput
             label="Имя"
+            value={values.name}
+            error={!!(touched.name && errors.name)}
             onChangeText={(val) =>
               /[^а-яА-Я]+/.test(val) || setFieldValue("name", val)
             }
             onFocus={handleBlur("name")}
-            value={values.name}
             mode="outlined"
             theme={{ roundness: 15 }}
-            error={touched.name && errors.name ? true : false}
           />
           <HelperText type="error">{touched.name && errors.name}</HelperText>
 
           <TextInput
             label="E-mail"
+            value={values.email}
+            error={!!(touched.email && errors.email)}
             onChangeText={handleChange("email")}
             onFocus={handleBlur("email")}
-            value={values.email}
             mode="outlined"
             theme={{ roundness: 15 }}
-            error={touched.email && errors.email ? true : false}
             keyboardType="email-address"
           />
           <HelperText type="error">{touched.email && errors.email}</HelperText>
@@ -121,26 +123,25 @@ export default () => {
           <View>
             <TextInput
               label="Телефон"
+              value={values.phoneNumber}
+              error={!!(touched.phoneNumber && errors.phoneNumber)}
               onChangeText={handleChange("phoneNumber")}
               onFocus={handleBlur("phoneNumber")}
-              disableFullscreenUI={true}
-              value={values.phoneNumber}
               theme={{ roundness: 15 }}
               mode="outlined"
-              error={touched.phoneNumber && errors.phoneNumber ? true : false}
               keyboardType="phone-pad"
-              style={{
-                paddingLeft: 100,
-              }}
+              style={{ paddingLeft: 100 }}
               render={(props) => (
-                // @ts-ignore
                 <MaskedTextInput
-                  {...props}
+                  {...(props as MaskedTextInputProps)}
                   mask="999 999 99 99 99 9"
                   defaultValue={initialValues.phoneNumber}
                 />
               )}
             />
+            <HelperText type="error">
+              {touched.phoneNumber && errors.phoneNumber}
+            </HelperText>
 
             <Dropdown
               data={data}
@@ -148,19 +149,15 @@ export default () => {
               renderItem={({ value, country }) => {
                 return (
                   <View style={styles.dropdownItem}>
-                    <Text style={{ fontSize: 16, width: "70%" }}>
-                      {country}
-                    </Text>
-                    <Text style={{ fontSize: 16 }}>{value}</Text>
+                    <Text style={styles.dropdownItemTextLeft}>{country}</Text>
+                    <Text style={styles.dropdownItemTextRight}>{value}</Text>
                   </View>
                 );
               }}
               labelField="value"
               valueField="value"
               dropdownPosition="bottom"
-              selectedTextProps={{
-                numberOfLines: 1,
-              }}
+              selectedTextProps={{ numberOfLines: 1 }}
               autoScroll={false}
               activeColor="#333"
               style={styles.dropdown}
@@ -182,17 +179,17 @@ export default () => {
                     : colors.disabled,
               }}
               value={values.countryCode}
-              onFocus={() => setIsFocus(true)}
-              onBlur={() => setIsFocus(false)}
+              onFocus={() => setIsDropdownOpened(true)}
+              onBlur={() => setIsDropdownOpened(false)}
               onChange={({ value }) => {
                 handleChange("countryCode")(value);
-                setIsFocus(false);
+                setIsDropdownOpened(false);
               }}
             />
 
             <View style={[styles.separator, { borderRightColor: "#555" }]} />
 
-            {isFocus && (
+            {isDropdownOpened && (
               <View
                 style={{
                   width: "100%",
@@ -211,17 +208,13 @@ export default () => {
             )}
           </View>
 
-          <HelperText type="error">
-            {touched.phoneNumber && errors.phoneNumber}
-          </HelperText>
-
           <Button
             onPress={handleSubmit}
             mode="contained"
             uppercase={false}
             style={styles.button}
             labelStyle={styles.buttonLabel}
-            disabled={checked && isValid ? false : true}
+            disabled={!checked || !isValid}
           >
             Далее
           </Button>
@@ -252,6 +245,11 @@ export default () => {
 };
 
 const styles = StyleSheet.create({
+  heading: {
+    fontSize: 30,
+    fontWeight: "bold",
+    marginVertical: 50,
+  },
   button: {
     borderRadius: 30,
     marginTop: 10,
@@ -290,6 +288,13 @@ const styles = StyleSheet.create({
     justifyContent: "space-between",
     alignItems: "center",
     padding: 15,
+  },
+  dropdownItemTextLeft: {
+    fontSize: 16,
+    width: "70%",
+  },
+  dropdownItemTextRight: {
+    fontSize: 16,
   },
   phoneInputFocused: {
     borderBottomLeftRadius: 0,

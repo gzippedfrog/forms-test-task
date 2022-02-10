@@ -1,22 +1,8 @@
 import React from "react";
-import { ScrollView, StatusBar, StyleSheet, Text } from "react-native";
-import {
-  Provider as PaperProvider,
-  DarkTheme,
-  Appbar,
-} from "react-native-paper";
-import MyForm from "./components/MyForm";
-
-let theme = {
-  ...DarkTheme,
-  colors: {
-    ...DarkTheme.colors,
-    primary: "#0063FF",
-    error: "#DE494A",
-    background: "#1F1F1F",
-    disabled: "#8F8F8F",
-  },
-};
+import { ScrollView, StatusBar, StyleSheet } from "react-native";
+import { Provider as PaperProvider, Appbar } from "react-native-paper";
+import SignUpForm from "./SignUpForm";
+import theme from "./theme";
 
 export default () => (
   <PaperProvider theme={theme}>
@@ -28,8 +14,7 @@ export default () => (
       style={{ backgroundColor: theme.colors.background }}
       contentContainerStyle={[styles.container]}
     >
-      <Text style={styles.heading}>Создать аккаунт</Text>
-      <MyForm />
+      <SignUpForm />
     </ScrollView>
   </PaperProvider>
 );
@@ -45,12 +30,5 @@ const styles = StyleSheet.create({
   },
   header: {
     backgroundColor: theme.colors.background,
-    elevation: 0,
-  },
-  heading: {
-    fontSize: 30,
-    fontWeight: "bold",
-    marginVertical: 50,
-    color: theme.colors.text,
   },
 });
